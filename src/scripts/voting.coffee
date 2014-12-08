@@ -8,7 +8,8 @@
 #   None
 #
 # Commands:
-#   hubot 投票 開始 item1, item2, item3, ... - 選択肢を設定し、投票受付を開始
+#   hubot 投票 開始 p=<purpose> item1, item2, item3, ... - 趣旨および選択肢を設定し、投票受付を開始
+#   hubot 投票 趣旨=<purpose> - 趣旨の書き換え
 #   hubot 投票 N - N は選択肢の番号または内容
 #   hubot 投票 選択肢 - 選択肢の一覧を表示
 #   hubot 投票 経過 - 投票の途中経過を表示
@@ -19,18 +20,20 @@
 #
 # Author:
 #   antonishen
+#   Mako N
 
 module.exports = (robot) ->
   robot.voting = {}
 
-  robot.respond /(?:start vote|(?:投票|採決)(?:\s*)開始)\s+(.+)$/i, (msg) ->
+  robot.respond /(?:start vote|(?:投票|採決)(?:\s*)開始)\s+(?:(?:p(?:urpose)?|要旨|主旨|趣旨)=\s*(.+)\s+)?(.+)$/i, (msg) ->
 
     if robot.voting.votes?
       msg.send "現在、投票期間中です。"
       sendChoices (msg)
     else
       robot.voting.votes = {}
-      createChoices msg.match[1]
+      robot.voting.purpose = msg.match[1]
+      createChoices msg.match[2]
 
       msg.send "投票受付を開始しました。"
       sendChoices(msg)
@@ -52,6 +55,13 @@ module.exports = (robot) ->
     else
       msg.send "終了させる投票はありません。"
 
+  robot.respond /(?:(?:投票|採決)\s*)?(?:purpose(?: of (?:the )?vote)?|p(?==)|要旨|主旨|趣旨)(?:=\s*(.+))?\s*$/i, (msg) ->
+    if msg.match[1]?
+      robot.voting.purpose = msg.match[1]
+      msg.send "投票の趣旨を書き換えました。\n" + robot.voting.purpose
+    else
+      msg.send robot.voting.purpose if robot.voting.purpose?
+    msg.finish()
 
   robot.respond /(show choices|((投票|採決)\s*)?(選択肢|候補))/i, (msg) ->
     sendChoices(msg)
@@ -89,6 +99,7 @@ module.exports = (robot) ->
 
     if robot.voting.choices?
       response = ""
+      response += robot.voting.purpose + "\n" if robot.voting.purpose?
       for choice, index in robot.voting.choices
         response += "#{index}: #{choice}"
         if results?
