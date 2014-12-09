@@ -1,12 +1,12 @@
 {
   "author": "joshingly",
   "name": "hubot-voting",
-  "version": "1.0.0",
+  "version": "1.0.0-1.0",
   "description": "A voting script for hubot",
   "main": "./src/index.coffee",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joshingly/hubot-voting.git"
+    "url": "https://github.com/mako09/hubot-voting.git"
   },
   "license": "MIT",
   "keywords": [
@@ -15,7 +15,7 @@
     "vote"
   ],
   "bugs": {
-    "url": "https://github.com/joshingly/hubot-voting/issues"
+    "url": "https://github.com/mako09/hubot-voting/issues"
   },
-  "homepage": "https://github.com/joshingly/hubot-voting"
+  "homepage": "https://github.com/mako09/hubot-voting"
 }
