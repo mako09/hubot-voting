@@ -48,4 +48,4 @@ or...
 
 ## License
 
-MIT licensed. Copyight 2014 Joshua Antonishen.
+MIT licensed. Copyight 2014 Joshua Antonishen, Mako N.
