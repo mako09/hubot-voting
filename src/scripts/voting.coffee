@@ -22,8 +22,10 @@
 #   antonishen
 #   Mako N
 
+VOTING_TABLE = 'hubot-voting-table'
+
 module.exports = (robot) ->
-  robot.voting = {}
+  robot.voting = robot.brain.get(VOTING_TABLE) || {}
 
   robot.respond /(?:start vote|(?:投票|採決)(?:\s*)開始)\s+(?:(?:p(?:urpose)?|要旨|主旨|趣旨)=\s*(.+)\s+)?(.+)$/i, (msg) ->
 
@@ -34,8 +36,9 @@ module.exports = (robot) ->
       robot.voting.votes = {}
       robot.voting.purpose = msg.match[1]
       createChoices msg.match[2]
-
+      robot.brain.set VOTING_TABLE, robot.voting
       msg.send "投票受付を開始しました。"
+
       sendChoices(msg)
 
   robot.respond /(end vote|(投票|採決)\s*(終了|締切))/i, (msg) ->
@@ -51,7 +54,9 @@ module.exports = (robot) ->
       msg.send response
 
       delete robot.voting.votes
+      delete robot.voting.purpose
       delete robot.voting.choices
+      robot.brain.set VOTING_TABLE, robot.voting
     else
       msg.send "終了させる投票はありません。"
 
@@ -59,6 +64,7 @@ module.exports = (robot) ->
     if msg.match[1]?
       robot.voting.purpose = msg.match[1]
       msg.send "投票の趣旨を書き換えました。\n" + robot.voting.purpose
+      robot.brain.set VOTING_TABLE, robot.voting
     else
       msg.send robot.voting.purpose if robot.voting.purpose?
     msg.finish()
@@ -88,6 +94,7 @@ module.exports = (robot) ->
     if validChoice choice
       robot.voting.votes[sender] = choice
       msg.send "#{sender} は #{robot.voting.choices[choice]} に投票しました。"
+      robot.brain.set VOTING_TABLE, robot.voting
     else
       msg.send "#{sender}: 有効な選択肢ではありません。"
       sendChoices(msg)
