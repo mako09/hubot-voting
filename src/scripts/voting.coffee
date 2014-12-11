@@ -25,10 +25,8 @@
 VOTING_TABLE = 'hubot-voting-table'
 
 module.exports = (robot) ->
-  robot.voting = robot.brain.get(VOTING_TABLE) || {}
-
   robot.respond /(?:start vote|(?:投票|採決)(?:\s*)開始)\s+(?:(?:p(?:urpose)?|要旨|主旨|趣旨)=\s*(.+)\s+)?(.+)$/i, (msg) ->
-
+    robot.voting = robot.brain.get(VOTING_TABLE) || {}
     if robot.voting.votes?
       msg.send "現在、投票期間中です。"
       sendChoices (msg)
@@ -42,6 +40,7 @@ module.exports = (robot) ->
       sendChoices(msg)
 
   robot.respond /(end vote|(投票|採決)\s*(終了|締切))/i, (msg) ->
+    robot.voting = robot.brain.get(VOTING_TABLE) || {}
     if robot.voting.votes?
       console.log robot.voting.votes
 
@@ -61,6 +60,7 @@ module.exports = (robot) ->
       msg.send "終了させる投票はありません。"
 
   robot.respond /(?:(?:投票|採決)\s*)?(?:purpose(?: of (?:the )?vote)?|p(?==)|要旨|主旨|趣旨)(?:=\s*(.+))?\s*$/i, (msg) ->
+    robot.voting = robot.brain.get(VOTING_TABLE) || {}
     if msg.match[1]?
       robot.voting.purpose = msg.match[1]
       msg.send "投票の趣旨を書き換えました。\n" + robot.voting.purpose
@@ -70,13 +70,16 @@ module.exports = (robot) ->
     msg.finish()
 
   robot.respond /(show choices|((投票|採決)\s*)?(選択肢|候補))/i, (msg) ->
+    robot.voting = robot.brain.get(VOTING_TABLE) || {}
     sendChoices(msg)
 
   robot.respond /(show votes|((投票|採決)\s*)?経過)/i, (msg) ->
+    robot.voting = robot.brain.get(VOTING_TABLE) || {}
     results = tallyVotes()
     sendChoices(msg, results)
 
   robot.respond /(?:vote(?:\s+for)?|(?:投票|挙手))\s*(.*)\s*$/i, (msg) ->
+    robot.voting = robot.brain.get(VOTING_TABLE) || {}
     return unless robot.voting.votes?
 
     choice = null
